@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import './Home.css';
-import logo from '../../img/scouter.png';
+import logo from '../../img/pnt.png';
 import logoBlack from '../../img/scouter_black.png';
 import {connect} from 'react-redux';
 import jQuery from "jquery";
@@ -116,7 +116,7 @@ class Home extends Component {
                         <div className="home-content">
                             <div className="top-div">
                                 <div className="logo-div"><img alt="scouter-logo" className="logo" src={this.props.config.theme === "theme-gray" ? logoBlack : logo}/></div>
-                                <div className="product">SCOUTER PAPER</div>
+                                <div className="product">P&T Indoorplus+ Monitoring System</div>
                                 <div className="version">V-{version}</div>
                                 <div className="power-by">powered by <a href="https://github.com/scouter-project/scouter" target="scouter_paper">scouter</a></div>
                                 <div className="compatibility">(SCOUTER Compatibility 2.6.2+)</div>
