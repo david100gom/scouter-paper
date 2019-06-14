@@ -45,7 +45,7 @@ const support = (browser.name !== "ie" && browser.name !== "edge");
 
 class App extends Component {
 
-    // 차트 크기가 변경되었을 경우, 차트가 다시 그려지지 않음 (window event만 동작)
+    // 차트 크기가 변경되었을 경우, 차트가 다시 그려지지 않음 (window event만 동작) .....
 
     alertTimer = null;
     initAlert = false;
