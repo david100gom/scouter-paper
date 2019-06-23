@@ -118,12 +118,18 @@ class Paper extends Component {
         }
 
         // URL로부터 range 컨트럴의 데이터를 세팅
-        let params = common.getParam(this.props, "realtime,longterm,from,to");
+        let params = common.getParam(this.props, "realtime,longterm,from,to,fromPast");
 
         let now = moment();
         let from = now.clone().subtract(10, "minutes");
         let to = now;
         if (params[2] && params[3]) {
+
+            let fromPast = true;
+            if (params[4] === false || params[4] === "false") {
+                fromPast = false;
+            }
+
             if (params[2].length === 14 && params[3].length === 14) {
                 from = moment(params[2], "YYYYMMDDhhmmss");
                 to = moment(params[3], "YYYYMMDDhhmmss");
@@ -139,8 +145,14 @@ class Paper extends Component {
                 to = from.clone().add(value, "minutes");
             }
 
+            // 현재 시간으로부터 조회라면, 계산된 value로 from to를 다시 세팅
+            if (!fromPast) {
+                to = moment();
+                from = to.clone().subtract(value, "minutes");
+            }
+
             if (!isNaN(value)) {
-                this.props.setRangeDateHoursMinutesValue(from, from.hours(), from.minutes(), value);
+                this.props.setRangeDateHoursMinutesValue(from, from.hours(), from.minutes(), value, fromPast);
                 this.needSearch = true;
                 this.needSearchFrom = from.valueOf();
                 this.needSearchTo = to.valueOf();
@@ -166,16 +178,6 @@ class Paper extends Component {
                 } else {
                     this.props.setRealTime(false, false);
                 }
-            }
-        }
-
-        if (params[2] && params[3]) {
-            let value = Math.floor((to.valueOf() - from.valueOf()) / (1000 * 60));
-            if (!isNaN(value)) {
-                this.props.setRangeDateHoursMinutesValue(from, from.hours(), from.minutes(), value);
-                this.needSearch = true;
-                this.needSearchFrom = from.valueOf();
-                this.needSearchTo = to.valueOf();
             }
         }
 
@@ -245,9 +247,8 @@ class Paper extends Component {
         }
 
         let anotherParam = {};
-        const templateNameReload = getData("templateName");
-        if (templateNameReload && templateNameReload.layout) {
-            anotherParam.layout = templateNameReload.layout;
+        if (templateName && templateName.layout) {
+            anotherParam.layout = templateName.layout;
         }
 
         common.setTargetServerToUrl(this.props, this.props.config, anotherParam);
@@ -666,15 +667,11 @@ class Paper extends Component {
 
     setLoading = (visible) => {
         if (visible) {
-            this.refs.loading.style.display = "table";
-            this.refs.loading.style.opacity = "1";
+            this.props.setControlVisibility('Loading',true);
         } else {
-            setTimeout(() => {
-                if (this.refs.loading) {
-                    this.refs.loading.style.opacity = "0";
-                    this.refs.loading.style.display = "none";
-                }
-            }, 300);
+            setTimeout(() =>{
+                this.props.setControlVisibility('Loading', false);
+            },300);
         }
     };
 
@@ -1558,31 +1555,7 @@ class Paper extends Component {
                     }
                    <Profiler selection={this.props.selection} newXLogs={this.state.data.newXLogs} xlogs={this.state.data.xlogs} startTime={this.state.data.startTime} realtime={this.props.range.realTime}/>
                    <ActiveService realtime={this.props.range.realTime} />
-                   <div className="loading" ref="loading">
-                        <div className="spinner_wrap">
-                            <svg className="spinner1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-                                <g className="anim-0">
-                                    <circle cx="50" cy="50" r="50" fill="#1864ab"/>
-                                </g>
-                                <g className="anim-1">
-                                    <circle cx="50" cy="50" r="5" fill="white"/>
-                                </g>
-                                <g className="anim-2">
-                                    <circle cx="75" cy="50" r="5" fill="white"/>
-                                    <line x1="25" y1="50" x2="75" y2="50" stroke="white" stroke-width="3"/>
-                                </g>
-                                <g className="anim-3">
-                                    <circle cx="50" cy="25" r="5" fill="white"/>
-                                    <line x1="50" y1="25" x2="25" y2="75" stroke="white" stroke-width="3"/>
-                                    <line x1="50" y1="25" x2="75" y2="75" stroke="white" stroke-width="3"/>
-                                </g>
-                                <g className="anim-4">
-                                    <circle cx="75" cy="25" r="5" fill="white"/>
-                                    <line x1="75" y1="25" x2="25" y2="25" stroke="white" stroke-width="3"/>
-                                </g>
-                            </svg>
-                        </div>
-                    </div>
+
                 </div>}
             </div>
         );
@@ -1613,7 +1586,7 @@ let mapDispatchToProps = (dispatch) => {
         pushMessage: (category, title, content) => dispatch(pushMessage(category, title, content)),
         setControlVisibility: (name, value) => dispatch(setControlVisibility(name, value)),
         setRealTime: (realTime, longTerm) => dispatch(setRealTime(realTime, longTerm)),
-        setRangeDateHoursMinutesValue: (date, hours, minutes, value) => dispatch(setRangeDateHoursMinutesValue(date, hours, minutes, value)),
+        setRangeDateHoursMinutesValue: (date, hours, minutes, value, fromPast) => dispatch(setRangeDateHoursMinutesValue(date, hours, minutes, value, fromPast)),
         setTemplate: (boxes, layouts) => dispatch(setTemplate(boxes, layouts)),
         setLayoutName: (layout) => dispatch(setLayoutName(layout)),
         setBoxes: (boxes) => dispatch(setBoxes(boxes)),

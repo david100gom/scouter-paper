@@ -352,14 +352,24 @@ class Topology extends Component {
         result["category"] = null;
         switch (data.interactionType) {
             case "INTR_API_INCOMING" : {
-                result["objType"] = "API" + data[position + "ObjHash"];
-                result["objTypeName"] = "API";
+                //result["objType"] = "API" + data[position + "ObjHash"];
+                result["objType"] = "API-INCOMING-UNKNOWN";
+                result["objTypeName"] = "API-INCOMING-UNKNOWN";
+
+                if (position === "from") {
+                    result["category"] = "API-INCOMING-UNKNOWN";
+                }
                 break;
             }
 
             case "INTR_API_OUTGOING" : {
-                result["objType"] = "API" + data[position + "ObjHash"];
-                result["objTypeName"] = "API";
+                //result["objType"] = "API" + data[position + "ObjHash"];
+                result["objType"] = "API-UNKNOWN";
+                result["objTypeName"] = "API-UNKNOWN";
+
+                if (position === "to") {
+                    result["category"] = "API-UNKNOWN";
+                }
                 break;
             }
 
@@ -882,9 +892,10 @@ class Topology extends Component {
     };
     _showTooltip = (d, isShow=false) =>{
 
-
-        if (this.props.topologyOption.highlight && this.props.topologyOption.grouping && d.objCategory !== "CLIENT" ) {
-            const toolTipOffset= this.props.control.Controller === "max" ? -130: +230;
+        if (this.props.topologyOption.highlight && this.props.topologyOption.grouping && (  d.objCategory && d.objCategory !== "CLIENT" ) ) {
+            const isLocationMove = this.props.control.Controller === "max" && this.props.control.pin;
+            const toolTipOffsetX=  isLocationMove ? -380 : -20;
+            const toolTipOffsetY=  -70;
 
             let dpObjName = [];
 
@@ -893,7 +904,6 @@ class Topology extends Component {
             }else{
                 dpObjName = this.objTypeNameMap.get(d.id);
             }
-
             this.tooltip.transition(500).style("opacity", 1);
             this.tooltip.html(
                 //- tooltip value 값을 응답 시간을 최대 시간 기준으로 최대 10개로 제한 한다.
@@ -924,8 +934,8 @@ class Topology extends Component {
                     })
                 .join(' ')
             )
-            .style("left",(d3.event.pageX - d3.select('.tooltip').node().offsetWidth + toolTipOffset) + "px")
-            .style("top",(d3.event.pageY - d3.select('.tooltip').node().offsetHeight) + "px");
+            .style("left",[d3.event.pageX + toolTipOffsetX,"px"].join(''))
+            .style("top",[d3.event.pageY + toolTipOffsetY,"px"].join(''));
         }
 
         if(!isShow){
@@ -1016,7 +1026,7 @@ class Topology extends Component {
                 return edge.prevStyle;
             }
         } else {
-            return "flow 1s infinite steps(20)";
+            return "flow 0s infinite steps(20)";
         }
     };
 
