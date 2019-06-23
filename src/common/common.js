@@ -1,7 +1,7 @@
 // local storage access
 import moment from "moment";
 import {Dictionary, DictType} from "./dictionary";
-export const version = "2.4.0";
+export const version = "2.5.0";
 
 export function getData(key) {
     let ls = null;
@@ -395,6 +395,7 @@ export function setRangePropsToUrl (props, pathname, objects) {
 
     search.set("from", from.format("YYYYMMDDHHmmss"));
     search.set("to", to.format("YYYYMMDDHHmmss"));
+    search.set("fromPast", props.range.fromPast);
 
     if (props.location.search !== ("?" + search.toString())) {
         if (pathname) {
