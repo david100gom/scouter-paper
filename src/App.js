@@ -253,6 +253,8 @@ class App extends Component {
         }
     };
 
+    // TODO paper config 에서 나오는 항목들 - host/javaee/ 등등등
+    // http://localhost:6188/scouter/v1/info/counter-model
     getCounterModel = (config, user, handleError) => {
         jQuery.ajax({
             method: "GET",
